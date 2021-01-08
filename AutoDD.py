@@ -33,6 +33,7 @@ import sys
 import argparse
 from yahooquery import Ticker
 
+# TODO: Move these to a constants holder class or to a json file or sthg
 
 # dictionary of possible subreddits to search in with their respective column name
 subreddit_dict = {'pennystocks' : 'pnystks',
@@ -176,6 +177,8 @@ def filter_tbl(tbl, min_val):
     :param int min: the number of days in the past
     :returns: the filtered table
     """
+
+    # TODO: BANNED_WORDS to the same constants class referenced before?
     BANNED_WORDS = [
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU', 'AMTES', 'WILL', 'CDT', 'SUPPO', 'MERGE',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO', 'TLDR', 'SHIT', 'ETF', 'BOOM', 'THANK', 'MAYBE', 'AKA',
@@ -301,8 +304,7 @@ def getTickerInfo(results_tbl):
 
     return filtered_tbl
 
-if __name__ == '__main__':
-
+def main(args): 
     # Instantiate the parser
     parser = argparse.ArgumentParser(description='AutoDD Optional Parameters')
 
@@ -352,3 +354,6 @@ if __name__ == '__main__':
         results_tbl = getTickerInfo(results_tbl)
 
     print_tbl(results_tbl)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
