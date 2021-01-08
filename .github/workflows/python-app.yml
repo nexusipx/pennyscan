@@ -26,7 +26,7 @@ jobs:
         pip install psaw
         pip install yahooquery
         pip install tabulate
-        py AutoDD.py --adv
+        python AutoDD.py --adv
     - name: AutoDD gen
       run: |
         # stop the build if there are Python syntax errors or undefined names
