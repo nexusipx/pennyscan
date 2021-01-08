@@ -21,18 +21,17 @@
 __author__ = "Fufu Fang" "kaito1410"
 __copyright__ = "The GNU General Public License v3.0"
 
-from psaw import PushshiftAPI
-from datetime import datetime, timedelta
-from tabulate import tabulate
-from datetime import datetime
-
-import os
+import argparse
 import math
+import os
 import re
 import sys
-import argparse
-from yahooquery import Ticker
+from datetime import datetime, timedelta
 
+import pandas as pd
+from psaw import PushshiftAPI
+from tabulate import tabulate
+from yahooquery import Ticker
 
 # dictionary of possible subreddits to search in with their respective column name
 subreddit_dict = {'pennystocks' : 'pnystks',
@@ -249,12 +248,20 @@ def print_tbl(tbl):
 
     # write to file
     with open(completeName, "a") as myfile:
-        myfile.write("date and time now = ")
-        myfile.write(dt_string)
-        myfile.write('\n')
-        myfile.write(tabulate(tbl, headers=header))
-        myfile.write('\n\n')
-    
+        # myfile.write("date and time now = ")
+        # myfile.write(dt_string)
+        # myfile.write('\n')
+        myfile.write('<!DOCTYPE html>')
+        myfile.write('<html>')
+        myfile.write('<body>')
+        myfile.write(tabulate(tbl, headers=header, tablefmt="html"))
+        myfile.write('<script src="sorttable.js"></script>')
+        myfile.write('<script src="addclass.js"></script>')
+        myfile.write('</body>')
+        myfile.write('</html> ')
+        
+        # myfile.write('\n\n')
+
     #logs to console
     print("Wrote to file successfully: ")
     print(completeName)
@@ -321,7 +328,7 @@ if __name__ == '__main__':
     parser.add_argument('--sort', nargs='?', const=1, type=int, default=1,
                     help='Sort the results table by descending order of score, 1 = sort by total score, 2 = sort by recent score, 3 = sort by previous score, 4 = sort by change in score')
 
-    parser.add_argument('--filename', nargs='?', const='table_records.txt', type=str, default='table_records.txt',
+    parser.add_argument('--filename', nargs='?', const='table_records.html', type=str, default='table_records.html',
                     help='Change the file name from table_records.txt to whatever you wish')
 
     args = parser.parse_args()
