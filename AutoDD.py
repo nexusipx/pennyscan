@@ -34,17 +34,17 @@ from tabulate import tabulate
 from yahooquery import Ticker
 
 # dictionary of possible subreddits to search in with their respective column name
-subreddit_dict = {'pennystocks' : 'pnystks',
-                  'RobinHoodPennyStocks' : 'RHPnnyStck',
-                  'Daytrading' : 'daytrade',
-                  'StockMarket' : 'stkmrkt',
+subreddit_dict = {'pennystocks' : 'pennystocks',
+                  'RobinHoodPennyStocks' : 'RH_PennyStocks',
+                  'Daytrading' : 'Daytrading',
+                  'StockMarket' : 'StockMarket',
                   'stocks' : 'stocks'}
 
 # dictionary of ticker financial information to get from yahoo
-financial_measures = {'currentPrice' : 'Price', 'quickRatio': 'QckRatio', 'currentRatio': 'CrntRatio', 'targetMeanPrice': 'trgtmean', 'recommendationKey': 'recommadtn'}
+financial_measures = {'currentPrice' : 'Price', 'quickRatio': 'QuickRatio', 'currentRatio': 'CurrentRatio', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
 
 # dictionary of ticker summary information to get from yahoo
-summary_measures = {'previousClose' : 'prvCls', 'open': 'open', 'dayLow': 'daylow', 'dayHigh': 'dayhigh', 'payoutRatio': 'pytRatio', 'forwardPE': 'forwardPE', 'beta': 'beta', 'bidSize': 'bidSize', 'askSize': 'askSize', 'volume': 'volume', 'averageVolume': 'avgvolume', 'averageVolume10days': 'avgvlmn10', 'fiftyDayAverage': '50dayavg', 'twoHundredDayAverage': '200dayavg'}
+summary_measures = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'payoutRatio': 'PayoutRatio', 'forwardPE': 'ForwardPE', 'beta': 'Beta', 'bidSize': 'BidSize', 'askSize': 'AskSize', 'volume': 'Volume', 'averageVolume': 'AverageVolume', 'averageVolume10days': 'AverageVolume10Days', 'fiftyDayAverage': '50DayAverage', 'twoHundredDayAverage': '200DayAverage'}
 
 
 # note: the following scoring system is tuned to calculate a "popularity" score
@@ -68,7 +68,8 @@ def get_submission(n, sub):
     m. for each subreddit in subreddit_dict, create a new results list from 2n hours ago until now
      """
 
-    val = subreddit_dict.pop(sub, None)
+    # val = subreddit_dict.pop(sub, None)
+    val = list(subreddit_dict.keys())[0]
     if val is None:
         print('invalid subreddit: ' + sub)
         quit()
@@ -95,6 +96,7 @@ def get_submission(n, sub):
 
     # results for the other subreddits
     for key in subreddit_dict:
+        print('key = ' + key)
         results.append(api.search_submissions(after=timestamp_start,
                                     before=timestamp_end,
                                     subreddit=key,
@@ -248,19 +250,18 @@ def print_tbl(tbl):
 
     # write to file
     with open(completeName, "a") as myfile:
-        # myfile.write("date and time now = ")
-        # myfile.write(dt_string)
-        # myfile.write('\n')
         myfile.write('<!DOCTYPE html>')
         myfile.write('<html>')
+        myfile.write('<link rel="stylesheet" href="style.css">')
         myfile.write('<body>')
+        myfile.write('</head>')
+        myfile.write('<body>')
+        myfile.write('<h1>' + dt_string + '</h1>')
         myfile.write(tabulate(tbl, headers=header, tablefmt="html"))
         myfile.write('<script src="sorttable.js"></script>')
         myfile.write('<script src="addclass.js"></script>')
         myfile.write('</body>')
         myfile.write('</html> ')
-        
-        # myfile.write('\n\n')
 
     #logs to console
     print("Wrote to file successfully: ")

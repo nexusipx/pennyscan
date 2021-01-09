@@ -1,8 +1,16 @@
-function addClass() { 
+function addSortableClassToTable() { 
     var list = document.getElementsByTagName("table");
     for (let item of list) {
         item.classList.add("sortable");
     }
 };
 
-addClass();
+function addStyledTableClassToTable() {
+	var list = document.getElementsByTagName("table");
+    for (let item of list) {
+        item.classList.add("styled-table");
+    }
+};
+
+addSortableClassToTable();
+addStyledTableClassToTable();
