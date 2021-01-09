@@ -48,10 +48,10 @@ summary_measures = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow':
 
 
 # dictionary of ticker financial information to get from yahoo - custom use.
-financial_measures_custom = {'currentPrice' : 'Price', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
+financial_measures_custom = {'currentPrice' : 'CurrentPrice', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
 
 # dictionary of ticker summary information to get from yahoo - custom use.
-summary_measures_custom = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'volume': 'Volume', 'averageVolume': 'AverageVolume'}
+summary_measures_custom = {'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'volume': 'Volume', 'averageVolume': 'AverageVolume'}
 
 
 # note: the following scoring system is tuned to calculate a "popularity" score
@@ -93,23 +93,22 @@ def get_submission(n, sub):
     results.append(api.search_submissions(after=timestamp_mid,
                                  before=timestamp_end,
                                  subreddit=sub,
-                                 filter=['title', 'link_flair_text', 'selftext', 'score'])) 
+                                 filter=['url', 'title', 'link_flair_text', 'selftext', 'score'])) 
 
     # results from the last 2n hours until n hours ago
     results.append(api.search_submissions(after=timestamp_start,
                                  before=timestamp_mid,
                                  subreddit=sub,
-                                 filter=['title', 'link_flair_text', 'selftext', 'score'])) 
+                                 filter=['url', 'title', 'link_flair_text', 'selftext', 'score'])) 
 
     # results for the other subreddits
     for key in subreddit_dict:
         results.append(api.search_submissions(after=timestamp_start,
                                     before=timestamp_end,
                                     subreddit=key,
-                                    filter=['title', 'link_flair_text', 'selftext', 'score']))
+                                    filter=['url', 'title', 'link_flair_text', 'selftext', 'score']))
 
     return results
-
 
 def get_freq_list(gen):
     """
@@ -127,6 +126,7 @@ def get_freq_list(gen):
 
     # Dictionary containing the summaries
     all_dict = {}
+    reddit_list_dict = {}
 
     # looping over each thread
     for i in gen:
@@ -138,6 +138,7 @@ def get_freq_list(gen):
         if hasattr(i, 'link_flair_text'):
             if 'DD' in i.link_flair_text:
                 increment += bonus_points
+
             if 'Catalyst' in i.link_flair_text:
                 increment += bonus_points
 
@@ -149,14 +150,20 @@ def get_freq_list(gen):
         if hasattr(i, 'title'):
             title = ' ' + i.title + ' '
             title_extracted = set(re.findall(pattern, title))
-  
             # title_extracted is a set, duplicate tickers from the same title counted once only
             for j in title_extracted:
-
                 if j in all_dict:
                     all_dict[j] += increment
                 else:
                     all_dict[j] = increment
+                
+                if hasattr(i, 'link_flair_text'):
+                    if 'DD' in i.link_flair_text or 'Catalyst' in i.link_flair_text:
+                        # print(j + ' and ' + i.url)
+                        if j in reddit_list_dict:
+                            reddit_list_dict[j] += '' + i.url + '\n'
+                        else:
+                            reddit_list_dict[j] = '' + i.url + '\n'
 
         # skip searching in text body if ticker was found in the title
         if len(title_extracted) > 0:
@@ -167,13 +174,12 @@ def get_freq_list(gen):
             selftext = ' ' + i.selftext + ' '
             selftext_extracted = set(re.findall(pattern, selftext))
             for j in selftext_extracted:
-
                 if j in all_dict:
                     all_dict[j] += increment
                 else:
                     all_dict[j] = increment
 
-    return all_dict.items(), all_dict 
+    return all_dict.items(), all_dict, reddit_list_dict
 
 def filter_tbl(tbl, min_val):
     """
@@ -192,7 +198,6 @@ def filter_tbl(tbl, min_val):
     tbl = [row for row in tbl if row[1][0] >= min_val or row[1][1] >= min_val]
     tbl = [row for row in tbl if row[0] not in BANNED_WORDS]
     return tbl
-
 
 def combine_tbl(tbl_current, tbl_prev):
     """
@@ -214,10 +219,13 @@ def combine_tbl(tbl_current, tbl_prev):
 
     return dict_result.items()
 
+def combine_reddit_posts(current_rddt, previous_rddt):
+    dict_result = {**current_rddt, **previous_rddt}
+    return dict_result
 
 def additional_filter(results_tbl, filter_collection):
 
-    _, filter_dict = get_freq_list(filter_collection)
+    _, filter_dict, _ = get_freq_list(filter_collection)
 
     for k, v in results_tbl:
         if k in filter_dict.keys():
@@ -234,13 +242,17 @@ def get_list_val(lst, index):
         except IndexError:
             return 0
 
-
-def print_tbl(tbl):
+def print_tbl(tbl, args):
 
     header = ["Code", "Total", "Recent", "Prev", "Change"]
     header = header + list(subreddit_dict.values())
-    header = header + list(summary_measures.values())
-    header = header + list(financial_measures.values())
+
+    if (args.custom):
+        header = header + list(summary_measures_custom.values())
+        header = header + list(financial_measures_custom.values())
+    else:
+        header = header + list(summary_measures.values())
+        header = header + list(financial_measures.values())
 
     tbl = [[k] + v for k, v in tbl]
 
@@ -333,7 +345,6 @@ def getCustomTickerInfo(results_tbl):
                 else:
                     entry[1].append(0)
 
-
             for measure in financial_measures_custom.keys():
                 result = get_nested(ticker.financial_data, entry[0], measure)
                 if result is not None:
@@ -345,6 +356,17 @@ def getCustomTickerInfo(results_tbl):
 
             if valid:
                 filtered_tbl.append(entry)
+
+    return filtered_tbl
+
+def getRedditDDLinks(results_tbl, reddit_list_table):
+    filtered_tbl = []
+
+    for entry in results_tbl:
+        ticker = entry[0]
+        if ticker is not None:
+            entry[1].append(reddit_list_table[ticker])
+        filtered_tbl.append(entry)
 
     return filtered_tbl
 
@@ -379,10 +401,11 @@ if __name__ == '__main__':
     # call reddit api to get results
     results_from_api = get_submission(args.interval/2, args.sub)  
 
-    current_tbl, _ = get_freq_list(results_from_api[0])
-    prev_tbl, _ = get_freq_list(results_from_api[1])
+    current_tbl, _,  current_reddit_links = get_freq_list(results_from_api[0])
+    prev_tbl, _, previous_reddit_links = get_freq_list(results_from_api[1])
 
     results_tbl = combine_tbl(current_tbl, prev_tbl)
+    results_tbl_rddt = combine_reddit_posts(current_reddit_links, previous_reddit_links)
 
     for api_result in results_from_api[2:]:
         results_tbl = additional_filter(results_tbl, api_result)
@@ -406,4 +429,6 @@ if __name__ == '__main__':
         print('doing adv')
         results_tbl = getCustomTickerInfo(results_tbl)
 
-    print_tbl(results_tbl)
+    results_tbl = getRedditDDLinks(results_tbl, results_tbl_rddt)
+
+    print_tbl(results_tbl, args)
