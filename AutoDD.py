@@ -262,14 +262,23 @@ def print_tbl(tbl):
     with open(completeName, "a") as myfile:
         myfile.write('<!DOCTYPE html>')
         myfile.write('<html>')
+        myfile.write('<head>')
         myfile.write('<link rel="stylesheet" href="style.css">')
-        myfile.write('<body>')
+        myfile.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>')
         myfile.write('</head>')
         myfile.write('<body>')
+  
+        for key in subreddit_dict:
+            if(key == 'RobinHoodPennyStocks'):
+                myfile.write('<p><input type="checkbox" name="RH_PennyStocks" checked=""> RH_PennyStocks</p>')
+            else:
+                myfile.write('<p><input type="checkbox" name="' + key + '" checked=""> '+ key + '</p>')
+          
         myfile.write('<h1>' + dt_string + '</h1>')
         myfile.write(tabulate(tbl, headers=header, tablefmt="html"))
         myfile.write('<script src="sorttable.js"></script>')
         myfile.write('<script src="addclass.js"></script>')
+        myfile.write('<script src="filters.js"></script>')
         myfile.write('</body>')
         myfile.write('</html> ')
 
