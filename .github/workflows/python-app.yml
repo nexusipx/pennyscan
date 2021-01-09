@@ -28,7 +28,7 @@ jobs:
         pip install tabulate
     - name: Running AutoDD
       run: |
-        python AutoDD.py --adv
+        python AutoDD.py --custom
     - name: Commit and Push
       run: |
         git config --global user.name "github-actions[bot]"
