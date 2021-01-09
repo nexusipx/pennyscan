@@ -47,6 +47,13 @@ financial_measures = {'currentPrice' : 'Price', 'quickRatio': 'QuickRatio', 'cur
 summary_measures = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'payoutRatio': 'PayoutRatio', 'forwardPE': 'ForwardPE', 'beta': 'Beta', 'bidSize': 'BidSize', 'askSize': 'AskSize', 'volume': 'Volume', 'averageVolume': 'AverageVolume', 'averageVolume10days': 'AverageVolume10Days', 'fiftyDayAverage': '50DayAverage', 'twoHundredDayAverage': '200DayAverage'}
 
 
+# dictionary of ticker financial information to get from yahoo - custom use.
+financial_measures_custom = {'currentPrice' : 'Price', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
+
+# dictionary of ticker summary information to get from yahoo - custom use.
+summary_measures_custom = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'volume': 'Volume', 'averageVolume': 'AverageVolume'}
+
+
 # note: the following scoring system is tuned to calculate a "popularity" score
 # feel free to make adjustments to suit your needs
 
@@ -279,9 +286,7 @@ def get_nested(data, *args):
             value = data.get(element)
             return value if len(args) == 1 else get_nested(value, *args[1:])
 
-
 def getTickerInfo(results_tbl):
-
     filtered_tbl = []
 
     for entry in results_tbl:
@@ -312,6 +317,37 @@ def getTickerInfo(results_tbl):
 
     return filtered_tbl
 
+def getCustomTickerInfo(results_tbl):
+    filtered_tbl = []
+
+    for entry in results_tbl:
+        ticker = Ticker(entry[0])
+        if ticker is not None: 
+            valid = False
+            for measure in summary_measures_custom.keys():
+                result = get_nested(ticker.summary_detail, entry[0], measure)
+                if result is not None:
+                    entry[1].append(result)
+                    if result != 0:
+                        valid = True
+                else:
+                    entry[1].append(0)
+
+
+            for measure in financial_measures_custom.keys():
+                result = get_nested(ticker.financial_data, entry[0], measure)
+                if result is not None:
+                    entry[1].append(result)
+                    if result != 0:
+                        valid = True
+                else:
+                    entry[1].append(0)
+
+            if valid:
+                filtered_tbl.append(entry)
+
+    return filtered_tbl
+
 if __name__ == '__main__':
 
     # Instantiate the parser
@@ -325,6 +361,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--adv', default=False, action='store_true',
                     help='Using this parameter shows advanced ticker information, running advanced mode is slower')
+
+    parser.add_argument('--custom', default=False, action='store_true',
+                    help='Using this parameter shows custom ticker information')
 
     parser.add_argument('--sub', nargs='?', const='pennystocks', type=str, default='pennystocks',
                     help='Choose a different subreddit to search for tickers in, default is pennystocks')
@@ -360,6 +399,11 @@ if __name__ == '__main__':
         results_tbl = sorted(results_tbl, key=lambda x: x[1][3], reverse=True)
 
     if args.adv:
+        print('doing adv')
         results_tbl = getTickerInfo(results_tbl)
+    
+    if args.custom:
+        print('doing adv')
+        results_tbl = getCustomTickerInfo(results_tbl)
 
     print_tbl(results_tbl)
