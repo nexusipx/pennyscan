@@ -96,7 +96,6 @@ def get_submission(n, sub):
 
     # results for the other subreddits
     for key in subreddit_dict:
-        print('key = ' + key)
         results.append(api.search_submissions(after=timestamp_start,
                                     before=timestamp_end,
                                     subreddit=key,
@@ -246,7 +245,11 @@ def print_tbl(tbl):
     #print(tabulate(tbl, headers=header))
 
     # save the file to the same dir as the AutoDD.py script
-    completeName = os.path.join(sys.path[0], args.filename)  
+    completeName = os.path.join(sys.path[0], args.filename) 
+
+    # Delete file if exists. We want fresh file everytime. No append.
+    if os.path.exists(completeName):
+        os.remove(completeName)
 
     # write to file
     with open(completeName, "a") as myfile:
