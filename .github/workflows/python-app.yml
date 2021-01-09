@@ -26,4 +26,6 @@ jobs:
         pip install psaw
         pip install yahooquery
         pip install tabulate
+    - name: Running AutoDD
+      run: |
         python AutoDD.py --adv
