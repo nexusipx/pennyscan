@@ -27,6 +27,7 @@ import os
 import re
 import sys
 from datetime import datetime, timedelta
+from timeit import default_timer as timer
 
 import pandas as pd
 from psaw import PushshiftAPI
@@ -235,12 +236,17 @@ def get_list_val(lst, index):
             return 0
 
 
-def print_tbl(tbl):
+def print_tbl(tbl, args):
 
     header = ["Code", "Total", "Recent", "Prev", "Change"]
     header = header + list(subreddit_dict.values())
-    header = header + list(summary_measures.values())
-    header = header + list(financial_measures.values())
+
+    if(args.custom):
+        header = header + list(summary_measures_custom.values())
+        header = header + list(financial_measures_custom.values())
+    else:
+        header = header + list(summary_measures.values())
+        header = header + list(financial_measures.values())
 
     tbl = [[k] + v for k, v in tbl]
 
@@ -362,7 +368,7 @@ def getCustomTickerInfo(results_tbl):
     return filtered_tbl
 
 if __name__ == '__main__':
-
+    start = timer()
     # Instantiate the parser
     parser = argparse.ArgumentParser(description='AutoDD Optional Parameters')
 
@@ -389,12 +395,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # call reddit api to get results
+    print('Searching reddit submissions for DD/Catalyst and such...')
     results_from_api = get_submission(args.interval/2, args.sub)  
 
+    print('Checking data for DD/Catalyst/Upvotes...')
     current_tbl, _ = get_freq_list(results_from_api[0])
     prev_tbl, _ = get_freq_list(results_from_api[1])
 
+    print('Filtering data...')
     results_tbl = combine_tbl(current_tbl, prev_tbl)
 
     for api_result in results_from_api[2:]:
@@ -412,11 +420,14 @@ if __name__ == '__main__':
         results_tbl = sorted(results_tbl, key=lambda x: x[1][3], reverse=True)
 
     if args.adv:
-        print('doing adv')
+        print('Creating advance table from yahoo api..')
         results_tbl = getTickerInfo(results_tbl)
     
     if args.custom:
-        print('doing adv')
+        print('Creating custom table from yahoo api...')
         results_tbl = getCustomTickerInfo(results_tbl)
 
-    print_tbl(results_tbl)
+    print_tbl(results_tbl, args)
+
+    elapsed_time = timer() - start
+    print('Took ' + str(elapsed_time) + ' seconds.')
