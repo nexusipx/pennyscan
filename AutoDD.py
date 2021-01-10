@@ -267,13 +267,17 @@ def print_tbl(tbl):
         myfile.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>')
         myfile.write('</head>')
         myfile.write('<body>')
-  
+        myfile.write('<img src="rocketcrew_logo.jpg" class="center">')
+        myfile.write('<h1>PennyStock AutoDD Scan</h1>')
+        myfile.write('<div class="dbgOuter">')
+
         for key in subreddit_dict:
             if(key == 'RobinHoodPennyStocks'):
-                myfile.write('<p><input type="checkbox" name="RH_PennyStocks" checked=""> RH_PennyStocks</p>')
+                myfile.write('<div class="dbgCont"><input type="checkbox" id="dbgRH_PennyStocks" class="dbgCheck" name="RH_PennyStocks" checked=""><label for="dbgRH_PennyStocks">RH_PennyStocks</label></div>')
             else:
-                myfile.write('<p><input type="checkbox" name="' + key + '" checked=""> '+ key + '</p>')
+                myfile.write('<div class="dbgCont"><input type="checkbox" id="dbg'+key+'" class="dbgCheck" name="' + key + '" checked=""> <label for="dbg'+key+'">'+ key + '</label></div>')
           
+        myfile.write('</div>')
         myfile.write('<h1>' + dt_string + '</h1>')
         myfile.write(tabulate(tbl, headers=header, tablefmt="html"))
         myfile.write('<script src="sorttable.js"></script>')
