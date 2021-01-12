@@ -311,8 +311,8 @@ def print_tbl(tbl, args):
 
 
         for x in tagDict:
-            myfile.write('<h1>Reddit Posts for: ' + x +'</h1>')
             myfile.write('<div id="' + x + '" class="overlay"> <div class="popup"> <a class="close" href="#">&times;</a> <div class="content">')
+            myfile.write('<h1>Reddit Posts for: ' + x +'</h1>')
             for y in tagDict[x]:
                 myfile.write('<a href="' + y + '">' + y + '</a> <br/>')
             myfile.write('</div></div></div>')

@@ -46,8 +46,11 @@ ul{
 	font-size: 0px;
 }
 .content > a {
-	
 	width: 100%;
+}
+
+.content > h1{
+	color:#7b7b7b;
 }
 
 a { padding:5px; font-weight:bold; float:left; }
