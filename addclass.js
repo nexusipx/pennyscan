@@ -18,10 +18,11 @@ function addTickerLinks(){
 	
     for(var i = 1; i < table.rows.length; i++) {
 		var firstCol = table.rows[i].cells[0]; 
-		var url = 'https://finance.yahoo.com/quote/'+firstCol.innerHTML.trim();
-        firstCol.innerHTML = "<a href='"+url+"'/>"+firstCol.innerHTML.toString()+"</a>";
+		var url = ''+firstCol.innerHTML.trim();
+        firstCol.innerHTML = "<a href='#"+ url + "'>"+url+"</a>";
     }
 }
+
 
 addSortableClassToTable();
 addStyledTableClassToTable();

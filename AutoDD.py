@@ -26,6 +26,7 @@ import math
 import os
 import re
 import sys
+import pandas as pd
 from datetime import datetime, timedelta
 from timeit import default_timer as timer
 
@@ -40,6 +41,8 @@ subreddit_dict = {'pennystocks' : 'pennystocks',
                   'Daytrading' : 'Daytrading',
                   'StockMarket' : 'StockMarket',
                   'stocks' : 'stocks'}
+
+tagDict = {}
 
 # dictionary of ticker financial information to get from yahoo
 financial_measures = {'currentPrice' : 'Price', 'quickRatio': 'QuickRatio', 'currentRatio': 'CurrentRatio', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
@@ -94,20 +97,20 @@ def get_submission(n, sub):
     results.append(api.search_submissions(after=timestamp_mid,
                                  before=timestamp_end,
                                  subreddit=sub,
-                                 filter=['title', 'link_flair_text', 'selftext', 'score'])) 
+                                 filter=['title', 'link_flair_text', 'selftext', 'score', 'url'])) 
 
     # results from the last 2n hours until n hours ago
     results.append(api.search_submissions(after=timestamp_start,
                                  before=timestamp_mid,
                                  subreddit=sub,
-                                 filter=['title', 'link_flair_text', 'selftext', 'score'])) 
+                                 filter=['title', 'link_flair_text', 'selftext', 'score', 'url'])) 
 
     # results for the other subreddits
     for key in subreddit_dict:
         results.append(api.search_submissions(after=timestamp_start,
                                     before=timestamp_end,
                                     subreddit=key,
-                                    filter=['title', 'link_flair_text', 'selftext', 'score']))
+                                    filter=['title', 'link_flair_text', 'selftext', 'score','url']))
 
     return results
 
@@ -159,6 +162,9 @@ def get_freq_list(gen):
                 else:
                     all_dict[j] = increment
 
+        if hasattr(i, 'url'):
+            url = ' ' + i.url + ' '
+
         # skip searching in text body if ticker was found in the title
         if len(title_extracted) > 0:
             continue
@@ -167,7 +173,12 @@ def get_freq_list(gen):
         if hasattr(i, 'selftext'):
             selftext = ' ' + i.selftext + ' '
             selftext_extracted = set(re.findall(pattern, selftext))
+
             for j in selftext_extracted:
+                if j in tagDict:
+                    tagDict[j].append(i.url)
+                else:
+                    tagDict.setdefault(j, [])
 
                 if j in all_dict:
                     all_dict[j] += increment
@@ -187,7 +198,8 @@ def filter_tbl(tbl, min_val):
     BANNED_WORDS = [
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU', 'AMTES', 'WILL', 'CDT', 'SUPPO', 'MERGE',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO', 'TLDR', 'SHIT', 'ETF', 'BOOM', 'THANK', 'MAYBE', 'AKA',
-        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', 'SSR', 'HOLD', 'SELL', 'COVID', 'GROUP', 'MONDA', 'PPP', 'REIT', 'HOT', 'USA'
+        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', 'SSR', 'HOLD', 'SELL', 'COVID', 'GROUP', 'MONDA', 'PPP', 'REIT', 'HOT', 
+        'USA', 'HUGE', 'CEO', 'NOOB', 'MONEY', 'WEEK', 'YOLO'
     ]
 
     tbl = [row for row in tbl if row[1][0] >= min_val or row[1][1] >= min_val]
@@ -238,6 +250,10 @@ def get_list_val(lst, index):
 
 def print_tbl(tbl, args):
 
+    for key, value in sorted(tagDict.items()):
+        for k in pd.unique(value).tolist():
+            print(key + " : " + k)
+
     header = ["Code", "Total", "Recent", "Prev", "Change"]
     header = header + list(subreddit_dict.values())
 
@@ -286,15 +302,34 @@ def print_tbl(tbl, args):
         myfile.write('</div>')
         myfile.write('<h1>' + dt_string + '</h1>')
         myfile.write(tabulate(tbl, headers=header, tablefmt="html"))
+
+        for x in tagDict:
+            myfile.write('<ul class="' + x + '">')
+            for y in tagDict[x]:
+                myfile.write('<li>' + y + '</li>')
+            myfile.write('</ul>')
+
+
+        for x in tagDict:
+            myfile.write('<h1>Reddit Posts for: ' + x +'</h1>')
+            myfile.write('<div id="' + x + '" class="overlay"> <div class="popup"> <a class="close" href="#">&times;</a> <div class="content">')
+            for y in tagDict[x]:
+                myfile.write('<a href="' + y + '">' + y + '</a> <br/>')
+            myfile.write('</div></div></div>')
+
         myfile.write('<script src="sorttable.js"></script>')
         myfile.write('<script src="addclass.js"></script>')
         myfile.write('<script src="filters.js"></script>')
         myfile.write('</body>')
         myfile.write('</html> ')
 
+       
+
     #logs to console
     print("Wrote to file successfully: ")
     print(completeName)
+
+
 
 def get_nested(data, *args):
     if args and data:

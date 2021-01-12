@@ -21,6 +21,7 @@
 .styled-table th,
 .styled-table td {
     padding: 12px 15px;
+	color: #bd6b17;
 }
 
 .styled-table tbody tr {
@@ -38,6 +39,103 @@
 .styled-table tbody tr.active-row {
     font-weight: bold;
     color: #009879;
+}
+
+ul{
+	visibility: hidden;
+	font-size: 0px;
+}
+.content > a {
+	
+	width: 100%;
+}
+
+a { padding:5px; font-weight:bold; float:left; }
+a:link { color:#7b7b7b; }
+a:visited { color:#506f84;  }
+a:active { color:#506f84; }
+	
+.box {
+  width: 40%;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.2);
+  padding: 35px;
+  border: 2px solid #fff;
+  border-radius: 20px/50px;
+  background-clip: padding-box;
+  text-align: center;
+}
+
+.button {
+  font-size: 1em;
+  padding: 10px;
+  color: #fff;
+  border-radius: 20px/50px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+}
+.button:hover {
+  background: #06D85F;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  margin: 70px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 5px;
+  width: 60%;
+  min-height:150px;
+  position: relative;
+  transition: all 5s ease-in-out;
+}
+
+.popup h2 {
+  margin-top: 0;
+  color: #333;
+  font-family: Tahoma, Arial, sans-serif;
+}
+.popup .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+.popup .close:hover {
+  color: #06D85F;
+}
+.popup .content {
+  max-height: 30%;
+  overflow: auto;
+}
+
+@media screen and (max-width: 700px){
+  .box{
+    width: 70%;
+  }
+  .popup{
+    width: 70%;
+  }
 }
 
 .dbgOuter{
@@ -131,8 +229,11 @@
 
         body {
             font-family: "Open sans", "Segoe UI", "Segoe WP", Helvetica, Arial, sans-serif;
-            color: #666;
-			background-color: #99aab5;
+			color: rgba(255,255,255,0.65);
+			background-color: #24292e;
+			background-image: url(star-bg.svg),linear-gradient(#191c20, #24292e 15%);
+			background-repeat: repeat-x;
+			background-position: center 0, 0 0, 0 0;
         }
         h1, h2 {
             margin-bottom: 5px;
