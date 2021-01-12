@@ -45,7 +45,7 @@ $("input:checkbox").click(function(){
 
 $('.toggle').click(function() {
 	
-    $('.PreviousClose').toggle();
+    	$('.PreviousClose').toggle();
 	$('.DayLow').toggle();
 	$('.Open').toggle();
 	$('.DayHigh').toggle();
@@ -65,4 +65,13 @@ $('.toggle').click(function() {
 			index = -1;
         }
     });
+	
+	if($(this).text().trim() == "Show / Hide Stock Details" || $(this).text().trim() == "Hide Stock Details"){
+		$('.toggle').text("Show Stock Details").button("refresh");
+	}else{
+		$('.toggle').text("Hide Stock Details").button("refresh"); 
+	}
+	
 });
+
+$('.toggle').click();
