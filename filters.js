@@ -45,7 +45,14 @@ $("input:checkbox").click(function(){
 
 $('.toggle').click(function() {
 	
-    $('.RH_PennyStocks').toggle();
+    $('.PreviousClose').toggle();
+	$('.DayLow').toggle();
+	$('.Open').toggle();
+	$('.DayHigh').toggle();
+	$('.AverageVolume').toggle();
+	$('.TargetMeanPrice').toggle();
+	$('.RecommendationKey').toggle();
+	
 	var index = -1;
 	
 	var thList = $( "th" ).each(function(index){
@@ -55,6 +62,7 @@ $('.toggle').click(function() {
             var subColumns = $("tbody td:nth-child("+(index+1)+")");
 
             $(subColumns).toggle();
+			index = -1;
         }
     });
 });
