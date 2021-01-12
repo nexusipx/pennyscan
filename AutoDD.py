@@ -199,7 +199,7 @@ def filter_tbl(tbl, min_val):
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU', 'AMTES', 'WILL', 'CDT', 'SUPPO', 'MERGE',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO', 'TLDR', 'SHIT', 'ETF', 'BOOM', 'THANK', 'MAYBE', 'AKA',
         'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', 'SSR', 'HOLD', 'SELL', 'COVID', 'GROUP', 'MONDA', 'PPP', 'REIT', 'HOT', 
-        'USA', 'HUGE', 'CEO', 'NOOB', 'MONEY', 'WEEK', 'YOLO'
+        'USA', 'HUGE', 'CEO', 'NOOB', 'MONEY', 'WEEK', 'YOLO', 'LOW'
     ]
 
     tbl = [row for row in tbl if row[1][0] >= min_val or row[1][1] >= min_val]
@@ -297,8 +297,12 @@ def print_tbl(tbl, args):
             if(key == 'RobinHoodPennyStocks'):
                 myfile.write('<div class="dbgCont"><input type="checkbox" id="dbgRH_PennyStocks" class="dbgCheck" name="RH_PennyStocks" checked=""><label for="dbgRH_PennyStocks">RH_PennyStocks</label></div>')
             else:
-                myfile.write('<div class="dbgCont"><input type="checkbox" id="dbg'+key+'" class="dbgCheck" name="' + key + '" checked=""> <label for="dbg'+key+'">'+ key + '</label></div>')
+                if(key == 'stocks' or key == 'Daytrading' or key ==  'StockMarket'):
+                    myfile.write('<div class="dbgCont"><input type="checkbox" id="dbg'+key+'" class="dbgCheck" name="' + key + '"> <label for="dbg'+key+'">'+ key + '</label></div>')
+                else:
+                    myfile.write('<div class="dbgCont"><input type="checkbox" id="dbg'+key+'" class="dbgCheck" name="' + key + '" checked=""> <label for="dbg'+key+'">'+ key + '</label></div>')
           
+        myfile.write('<button class="toggle">Show / Hide Stock Details</button>')
         myfile.write('</div>')
         myfile.write('<h1>' + dt_string + '</h1>')
         myfile.write(tabulate(tbl, headers=header, tablefmt="html"))

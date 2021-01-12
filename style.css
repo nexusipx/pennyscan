@@ -57,6 +57,10 @@ a { padding:5px; font-weight:bold; float:left; }
 a:link { color:#7b7b7b; }
 a:visited { color:#506f84;  }
 a:active { color:#506f84; }
+
+.hide{
+	display:none;
+}
 	
 .box {
   width: 40%;
@@ -139,6 +143,33 @@ a:active { color:#506f84; }
   .popup{
     width: 70%;
   }
+}
+
+.toggle{
+	
+}
+.toggle:hover {
+  letter-spacing: 0.6em;
+  background-color: #75a0bdc9;
+}
+
+.toggle {
+  color: white;
+}
+
+button {
+  height: 4em;
+  width: 100%;
+  padding: 1.5em auto;
+  margin: 1em auto;
+  background-color: #506f84;
+  border: none;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+      cursor: pointer;
+ 
 }
 
 .dbgOuter{
