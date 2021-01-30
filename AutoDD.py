@@ -47,16 +47,8 @@ tagDict = {}
 # dictionary of ticker financial information to get from yahoo
 financial_measures = {'currentPrice' : 'Price', 'quickRatio': 'QuickRatio', 'currentRatio': 'CurrentRatio', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
 
-# dictionary of ticker summary information to get from yahoo
-summary_measures = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'payoutRatio': 'PayoutRatio', 'forwardPE': 'ForwardPE', 'beta': 'Beta', 'bidSize': 'BidSize', 'askSize': 'AskSize', 'volume': 'Volume', 'averageVolume': 'AverageVolume', 'averageVolume10days': 'AverageVolume10Days', 'fiftyDayAverage': '50DayAverage', 'twoHundredDayAverage': '200DayAverage'}
-
-
 # dictionary of ticker financial information to get from yahoo - custom use.
 financial_measures_custom = {'currentPrice' : 'Price', 'targetMeanPrice': 'TargetMeanPrice', 'recommendationKey': 'RecommendationKey'}
-
-# dictionary of ticker summary information to get from yahoo - custom use.
-summary_measures_custom = {'previousClose' : 'PreviousClose', 'open': 'Open', 'dayLow': 'DayLow', 'dayHigh': 'DayHigh', 'volume': 'Volume', 'averageVolume': 'AverageVolume'}
-
 
 # note: the following scoring system is tuned to calculate a "popularity" score
 # feel free to make adjustments to suit your needs
@@ -199,7 +191,7 @@ def filter_tbl(tbl, min_val):
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU', 'AMTES', 'WILL', 'CDT', 'SUPPO', 'MERGE',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO', 'TLDR', 'SHIT', 'ETF', 'BOOM', 'THANK', 'MAYBE', 'AKA',
         'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', 'SSR', 'HOLD', 'SELL', 'COVID', 'GROUP', 'MONDA', 'PPP', 'REIT', 'HOT', 
-        'USA', 'HUGE', 'CEO', 'NOOB', 'MONEY', 'WEEK', 'YOLO', 'LOW'
+        'USA', 'HUGE', 'CEO', 'NOOB', 'MONEY', 'WEEK', 'YOLO', 'LOW', 'MOVIE', 'PUSH', 'NASDA', 'WHY', 'READ', 'FROM'
     ]
 
     tbl = [row for row in tbl if row[1][0] >= min_val or row[1][1] >= min_val]
@@ -258,10 +250,8 @@ def print_tbl(tbl, args):
     header = header + list(subreddit_dict.values())
 
     if(args.custom):
-        header = header + list(summary_measures_custom.values())
         header = header + list(financial_measures_custom.values())
     else:
-        header = header + list(summary_measures.values())
         header = header + list(financial_measures.values())
 
     tbl = [[k] + v for k, v in tbl]
@@ -351,15 +341,6 @@ def getTickerInfo(results_tbl):
         ticker = Ticker(entry[0])
         if ticker is not None: 
             valid = False
-            for measure in summary_measures.keys():
-                result = get_nested(ticker.summary_detail, entry[0], measure)
-                if result is not None:
-                    entry[1].append(result)
-                    if result != 0:
-                        valid = True
-                else:
-                    entry[1].append(0)
-
 
             for measure in financial_measures.keys():
                 result = get_nested(ticker.financial_data, entry[0], measure)
@@ -382,15 +363,6 @@ def getCustomTickerInfo(results_tbl):
         ticker = Ticker(entry[0])
         if ticker is not None: 
             valid = False
-            for measure in summary_measures_custom.keys():
-                result = get_nested(ticker.summary_detail, entry[0], measure)
-                if result is not None:
-                    entry[1].append(result)
-                    if result != 0:
-                        valid = True
-                else:
-                    entry[1].append(0)
-
 
             for measure in financial_measures_custom.keys():
                 result = get_nested(ticker.financial_data, entry[0], measure)
